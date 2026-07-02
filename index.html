@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Summer Challenge</title>
+<style>
+  :root{
+    --campo:#20402D;
+    --notte:#16241C;
+    --gesso:#F4F1E6;
+    --segnale:#E8622C;
+    --lino:#DAD2BC;
+    --vittoria:#C9A227;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--gesso);
+    color:var(--notte);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+  header{
+    background:var(--campo);
+    color:var(--gesso);
+    border-radius:14px;
+    padding:22px 20px;
+    margin-bottom:18px;
+  }
+  header h1{
+    margin:0 0 4px;
+    font-size:26px;
+    font-weight:900;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+  }
+  header p{margin:0;opacity:0.85;font-size:14px;}
+  .tabs{display:flex;gap:8px;margin-bottom:16px;}
+  .tab{
+    flex:1;
+    padding:10px;
+    text-align:center;
+    background:var(--lino);
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:0.3px;
+  }
+  .tab.active{background:var(--segnale);color:white;}
+  .card{
+    background:white;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:14px;
+    border:1px solid rgba(0,0,0,0.06);
+  }
+  label{display:block;font-size:13px;font-weight:700;margin:12px 0 5px;text-transform:uppercase;letter-spacing:0.3px;color:var(--campo);}
+  label:first-child{margin-top:0;}
+  input,select{
+    width:100%;
+    padding:11px;
+    border-radius:8px;
+    border:1.5px solid var(--lino);
+    font-size:15px;
+    background:var(--gesso);
+  }
+  input:focus,select:focus{outline:2px solid var(--segnale);border-color:var(--segnale);}
+  .hint{font-size:12px;color:#666;margin-top:4px;}
+  button.submit{
+    width:100%;
+    margin-top:18px;
+    padding:13px;
+    border:none;
+    border-radius:10px;
+    background:var(--segnale);
+    color:white;
+    font-weight:800;
+    font-size:15px;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    cursor:pointer;
+  }
+  button.submit:active{transform:translateY(1px);}
+  button.submit:disabled{opacity:0.5;}
+  #msg{margin-top:10px;font-size:14px;font-weight:600;min-height:18px;}
+  #msg.ok{color:var(--campo);}
+  #msg.err{color:#B3261E;}
+
+  .week-select{margin-bottom:12px;}
+  table{width:100%;border-collapse:collapse;}
+  th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    color:#666;
+    padding:6px 4px;
+    border-bottom:2px solid var(--notte);
+  }
+  td{padding:10px 4px;border-bottom:1px solid var(--lino);font-size:15px;}
+  .rank{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;height:26px;
+    border-radius:50%;
+    background:var(--campo);
+    color:white;
+    font-weight:800;
+    font-size:12px;
+  }
+  tr:first-child .rank{background:var(--vittoria);}
+  .pts{font-weight:900;font-family:Georgia,serif;font-size:18px;color:var(--campo);text-align:right;}
+  .empty{padding:20px 4px;color:#888;font-size:14px;text-align:center;}
+
+  .feed{max-height:220px;overflow-y:auto;}
+  .feed-item{
+    display:flex;justify-content:space-between;
+    padding:8px 0;border-bottom:1px solid var(--lino);
+    font-size:13px;color:#444;
+  }
+  .feed-item b{color:var(--notte);}
+  .feed-item span.p{color:var(--segnale);font-weight:700;}
+  .section-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.4px;color:var(--campo);margin:0 0 10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Summer Challenge</h1>
+    <p id="range-label">6 luglio – 30 agosto 2026 · 8 settimane</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="log">Registra</div>
+    <div class="tab" data-tab="board">Classifica</div>
+  </div>
+
+  <div id="tab-log">
+    <div class="card">
+      <label for="name">Il tuo nome</label>
+      <input id="name" list="names-list" placeholder="Es. Mario Rossi" autocomplete="off">
+      <datalist id="names-list"></datalist>
+
+      <label for="type">Tipo di allenamento</label>
+      <select id="type">
+        <option value="presenza">Presenza in campo — 5 pt fissi</option>
+        <option value="pesi">Sessione pesi / forza — 3 pt / 60'</option>
+        <option value="basso">Attività a basso impatto — 1 pt / 60'</option>
+        <option value="alto">Attività ad alto impatto — 2 pt / 60'</option>
+      </select>
+
+      <div id="minutes-block">
+        <label for="minutes">Minuti svolti</label>
+        <input id="minutes" type="number" min="1" max="480" placeholder="Es. 45">
+      </div>
+
+      <label for="date">Data allenamento</label>
+      <input id="date" type="date">
+      <div class="hint">Challenge attiva dal 6 luglio al 30 agosto 2026.</div>
+
+      <button class="submit" id="submit">Registra allenamento</button>
+      <div id="msg"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Ultimi allenamenti registrati</div>
+      <div class="feed" id="feed"></div>
+    </div>
+  </div>
+
+  <div id="tab-board" style="display:none;">
+    <div class="card">
+      <select id="week-select" class="week-select"></select>
+      <table>
+        <thead><tr><th>#</th><th>Nome</th><th style="text-align:right;">Punti</th></tr></thead>
+        <tbody id="board-body"></tbody>
+      </table>
+      <div class="empty" id="board-empty" style="display:none;">Nessun allenamento registrato ancora.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CHALLENGE_START = new Date('2026-07-06T00:00:00');
+const TOTAL_WEEKS = 8;
+const RATES = { presenza: null, pesi: 3, basso: 1, alto: 2 }; // null = fisso 5pt
+const LABELS = { presenza: 'Presenza in campo', pesi: 'Pesi / forza', basso: 'Basso impatto', alto: 'Alto impatto' };
+const API_URL = 'https://script.google.com/macros/s/AKfycbzALAe85y36y-qJJeO2JgnQ87XizZqJWqBirkyjfN4OrRHX63_yb9Tb8B5slN9ahnwtnQ/exec';
+
+let data = { names: [], workouts: [] };
+
+function weekOf(dateStr){
+  const d = new Date(dateStr + 'T00:00:00');
+  const diffDays = Math.floor((d - CHALLENGE_START) / 86400000);
+  if(diffDays < 0) return null;
+  const w = Math.floor(diffDays/7) + 1;
+  if(w > TOTAL_WEEKS) return null;
+  return w;
+}
+
+function weekLabel(w){
+  const start = new Date(CHALLENGE_START.getTime() + (w-1)*7*86400000);
+  const end = new Date(start.getTime() + 6*86400000);
+  const fmt = d => d.toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+  return `Settimana ${w} (${fmt(start)} – ${fmt(end)})`;
+}
+
+function pointsFor(entry){
+  if(entry.type === 'presenza') return 5;
+  return Math.round((RATES[entry.type] * entry.minutes / 60) * 10) / 10;
+}
+
+async function loadData(){
+  try{
+    const res = await fetch(API_URL);
+    const rows = await res.json();
+    data.workouts = rows.map(r => ({
+      name: String(r.name),
+      type: String(r.type),
+      minutes: r.minutes === '' || r.minutes === null ? null : Number(r.minutes),
+      date: String(r.date).slice(0,10),
+      week: Number(r.week),
+      ts: Number(r.ts)
+    }));
+    data.names = [...new Set(data.workouts.map(w => w.name))];
+  }catch(e){
+    setMsg('Impossibile caricare i dati dal foglio. Riprova più tardi.', false);
+  }
+  refreshNames();
+  refreshFeed();
+  refreshBoard();
+}
+
+async function addWorkout(entry){
+  await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight CORS
+    body: JSON.stringify(entry)
+  });
+}
+
+function refreshNames(){
+  const dl = document.getElementById('names-list');
+  dl.innerHTML = '';
+  [...new Set(data.names)].sort().forEach(n=>{
+    const o = document.createElement('option');
+    o.value = n;
+    dl.appendChild(o);
+  });
+}
+
+function refreshFeed(){
+  const feed = document.getElementById('feed');
+  const items = [...data.workouts].sort((a,b)=> b.ts - a.ts).slice(0,15);
+  if(items.length === 0){
+    feed.innerHTML = '<div class="empty">Ancora nessun allenamento.</div>';
+    return;
+  }
+  feed.innerHTML = items.map(w => `
+    <div class="feed-item">
+      <span><b>${escapeHtml(w.name)}</b> — ${LABELS[w.type]}${w.type!=='presenza' ? ' · '+w.minutes+"'" : ''}</span>
+      <span class="p">+${pointsFor(w)} pt</span>
+    </div>`).join('');
+}
+
+function populateWeekSelect(){
+  const sel = document.getElementById('week-select');
+  sel.innerHTML = '<option value="total">Classifica totale (tutta la challenge)</option>' +
+    Array.from({length: TOTAL_WEEKS}, (_,i)=> i+1)
+      .map(w => `<option value="${w}">${weekLabel(w)}</option>`).join('');
+}
+
+function refreshBoard(){
+  const sel = document.getElementById('week-select').value || 'total';
+  const totals = {};
+  data.workouts.forEach(w=>{
+    if(sel !== 'total' && String(w.week) !== sel) return;
+    totals[w.name] = (totals[w.name] || 0) + pointsFor(w);
+  });
+  const rows = Object.entries(totals).sort((a,b)=> b[1]-a[1]);
+  const body = document.getElementById('board-body');
+  const empty = document.getElementById('board-empty');
+  if(rows.length === 0){
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  body.innerHTML = rows.map(([name,pts], i)=> `
+    <tr>
+      <td><span class="rank">${i+1}</span></td>
+      <td>${escapeHtml(name)}</td>
+      <td class="pts">${Math.round(pts*10)/10}</td>
+    </tr>`).join('');
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function setMsg(text, ok){
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = ok ? 'ok' : 'err';
+}
+
+document.getElementById('type').addEventListener('change', e=>{
+  document.getElementById('minutes-block').style.display = e.target.value === 'presenza' ? 'none' : 'block';
+});
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-log').style.display = t.dataset.tab === 'log' ? 'block' : 'none';
+    document.getElementById('tab-board').style.display = t.dataset.tab === 'board' ? 'block' : 'none';
+  });
+});
+
+document.getElementById('week-select').addEventListener('change', refreshBoard);
+
+document.getElementById('submit').addEventListener('click', async ()=>{
+  const btn = document.getElementById('submit');
+  const name = document.getElementById('name').value.trim();
+  const type = document.getElementById('type').value;
+  const minutes = parseInt(document.getElementById('minutes').value, 10);
+  const date = document.getElementById('date').value;
+
+  if(!name){ setMsg('Inserisci il tuo nome.', false); return; }
+  if(!date){ setMsg('Seleziona una data.', false); return; }
+  const week = weekOf(date);
+  if(week === null){ setMsg('La data scelta è fuori dal periodo della challenge (6 luglio – 30 agosto).', false); return; }
+  if(type !== 'presenza' && (!minutes || minutes <= 0)){ setMsg('Inserisci i minuti svolti.', false); return; }
+
+  btn.disabled = true;
+  setMsg('Salvataggio...', true);
+  try{
+    await addWorkout({
+      name, type, minutes: type === 'presenza' ? '' : minutes,
+      date, week, ts: Date.now()
+    });
+    setMsg('Allenamento registrato ✓', true);
+    document.getElementById('minutes').value = '';
+    await loadData(); // rileggo il foglio per aggiornare feed e classifica
+  }catch(e){
+    setMsg('Errore nel salvataggio, riprova.', false);
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+// init
+(function init(){
+  const today = new Date();
+  const dateInput = document.getElementById('date');
+  dateInput.value = today.toISOString().slice(0,10);
+  dateInput.min = '2026-07-06';
+  dateInput.max = '2026-08-30';
+  populateWeekSelect();
+  loadData();
+})();
+</script>
+</body>
+</html>
