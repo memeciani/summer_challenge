@@ -455,6 +455,7 @@ document.querySelectorAll('.tab').forEach(t=>{
     document.getElementById('tab-log').style.display = t.dataset.tab === 'log' ? 'block' : 'none';
     document.getElementById('tab-board').style.display = t.dataset.tab === 'board' ? 'block' : 'none';
     document.getElementById('tab-manage').style.display = t.dataset.tab === 'manage' ? 'block' : 'none';
+    if(t.dataset.tab === 'board' || t.dataset.tab === 'manage') loadData(); // aggiorna con eventuali allenamenti di altri
   });
 });
 
@@ -482,13 +483,21 @@ document.getElementById('submit').addEventListener('click', async ()=>{
   btn.disabled = true;
   setMsg('Salvataggio...', true);
   try{
-    await addWorkout({
+    const entry = {
       id: makeId(), name, type, minutes: NO_MINUTES_TYPES.includes(type) ? '' : minutes,
       date, week, ts: Date.now()
-    });
+    };
+    await addWorkout(entry);
     setMsg('Allenamento registrato ✓', true);
     document.getElementById('minutes').value = '';
-    await loadData(); // rileggo il foglio per aggiornare feed e classifica
+
+    // aggiorno i dati in memoria invece di rileggere tutto il foglio (più veloce)
+    data.workouts.push({ ...entry, minutes: entry.minutes === '' ? null : entry.minutes });
+    if(!data.names.includes(name)) data.names.push(name);
+    refreshNames();
+    refreshFeed();
+    refreshBoard();
+    refreshManageAthletes();
   }catch(e){
     setMsg('Errore nel salvataggio, riprova.', false);
   }finally{
